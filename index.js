@@ -6,10 +6,7 @@ import CartRoutes from "./Routes/CartRoutes.js";
 import OrderRoutes from "./Routes/OrderRoutes.js";
 import UserAddressRoutes from "./Routes/UserAddressRoutes.js";
 import WarehouseRoutes from "./Routes/WarehouseRoutes.js";
-// import sequelize from "./Utils/sequelize.js";
 import UsersList from './TestFiles/UsersList.js'
-import MsSqlSequelize from "./Utils/MsSqlSequelize.js";
-import MySqlSequelize from "./Utils/MySqlSequelize.js";
 import AzureMySqlSequelize from "./Utils/AzureMySqlSequelize.js";
 import User from "./Models/User.js";
 import Cart from "./Models/Cart.js";

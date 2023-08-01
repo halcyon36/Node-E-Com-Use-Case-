@@ -1,7 +1,4 @@
 import { DataTypes } from "sequelize";
-// import MySqlSequelize from "../Utils/MySqlSequelize.js";
-// import MsSqlSequelize from "../Utils/MsSqlSequelize.js";
-import sequelize from "../Utils/sequelize.js";
 import AzureMySqlSequelize from "../Utils/AzureMySqlSequelize.js";
 const WarehouseProducts = AzureMySqlSequelize.define('WarehouseProducts',
 {
