@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize } from "sequelize";
 import sequelize from "../Utils/sequelize.js";
-import MsSqlSequelize from "../Utils/MsSqlSequelize.js";
-import MySqlSequelize from "../Utils/MySqlSequelize.js";
+// import MsSqlSequelize from "../Utils/MsSqlSequelize.js";
+// import MySqlSequelize from "../Utils/MySqlSequelize.js";
 import AzureMySqlSequelize from "../Utils/AzureMySqlSequelize.js";
 const UserAddress = AzureMySqlSequelize.define('UserAddress',
 {

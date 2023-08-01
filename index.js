@@ -48,7 +48,7 @@ app.use(Express.urlencoded({extended:true}))
 app.use(Express.json({extended:true}))
 app.use(async(req,res,next)=>
 {
-    const user = await User.findByPk('1f53faba-a607-4538-9daf-1d9d32f0e811');
+    const user = await User.findByPk('6200be8a-8991-435d-8820-9399ab67f399');
     req.user = user
     next();
 })
