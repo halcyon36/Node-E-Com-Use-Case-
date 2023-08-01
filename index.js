@@ -6,6 +6,7 @@ import CartRoutes from "./Routes/CartRoutes.js";
 import OrderRoutes from "./Routes/OrderRoutes.js";
 import UserAddressRoutes from "./Routes/UserAddressRoutes.js";
 import WarehouseRoutes from "./Routes/WarehouseRoutes.js";
+import ShipmentRoutes from "./Routes/ShipmentRoutes.js";
 import UsersList from './TestFiles/UsersList.js'
 import AzureMySqlSequelize from "./Utils/AzureMySqlSequelize.js";
 import User from "./Models/User.js";
@@ -19,6 +20,7 @@ import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from 'swagger-ui-express'
 import UserAddress from "./Models/UserAddress.js";
 import WarehouseProducts from "./Models/WarehouseProducts.js";
+import Shipment from "./Models/Shipment.js";
 const app = Express();
 const swaggerOptions = 
 {
@@ -45,7 +47,7 @@ app.use(Express.urlencoded({extended:true}))
 app.use(Express.json({extended:true}))
 app.use(async(req,res,next)=>
 {
-    const user = await User.findByPk('6200be8a-8991-435d-8820-9399ab67f399');
+    const user = await User.findByPk('e057bc3d-cdf9-41fd-9658-6e3b173151fb');
     req.user = user
     next();
 })
@@ -56,6 +58,7 @@ app.use('/cart',CartRoutes)
 app.use('/orders',OrderRoutes)
 app.use('/userAddress',UserAddressRoutes)
 app.use('/warehouse',WarehouseRoutes)
+app.use('/shipment',ShipmentRoutes)
 //user cart
 User.hasOne(Cart)
 Cart.belongsTo(User)
@@ -63,6 +66,10 @@ Cart.belongsTo(User)
 //user address
 User.hasMany(UserAddress)
 UserAddress.belongsTo(User)
+
+//user shipping
+User.hasMany(Shipment)
+Shipment.belongsTo(User)
 
 //Cart product
 Cart.belongsToMany(Product,{through:CartProducts})
@@ -79,6 +86,10 @@ Product.belongsToMany(Order,{through:OrderProducts})
 //warehouse product
 Warehouse.belongsToMany(Product,{through:WarehouseProducts})
 Product.belongsToMany(Warehouse,{through:WarehouseProducts})
+
+//orders shipment
+Order.hasOne(Shipment)
+Shipment.belongsTo(Order)
 
 // await user.createCart()
 // console.log(await user.getCart())

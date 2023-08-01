@@ -79,9 +79,7 @@ export const PlaceOrder = async(req,res,next)=>
     {
         const {id:orderId} = req.params
         if(!orderId) new Error('Invalid request, OrderId is missing')
-        let fetchedOrder = req.user.getOrders({where:{Id:orderId}})
-        if(!fetchedOrder) new Error(`Order:${orderId} does not exists`)
-        fetchedOrder = fetchedOrder[0]
+        let fetchedOrder = (await req.user.getOrders({where:{Id:orderId}}))[0]
         //check availability
         // let productsAvailable = true
         // orderedProducts = await fetchedOrder.getProducts()
@@ -92,7 +90,8 @@ export const PlaceOrder = async(req,res,next)=>
         // })
         // if(!productsAvailable)
         //     return res.status(200).json({statusCode:'400',message:`Order:${orderId} placing failed due to products unavailabililty`})
-        fetchedOrder.status = 'placed'
+        if(!fetchedOrder) throw new Error(`Order:${orderId} is invalid or does not exists`)
+        fetchedOrder.Status = 'placed'
         await fetchedOrder.save()
         return res.status(200).json({statusCode:'200',message:`Order:${orderId} Placed successfully`})
     }

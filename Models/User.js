@@ -43,6 +43,16 @@ const User = AzureMySqlSequelize.define(
         allowNull:false,
         // unique:true
     },
+    isActive:
+    {
+        type:DataTypes.BOOLEAN,
+        defaultValue:false
+    },
+    kycVerified:
+    {
+        type:DataTypes.BOOLEAN,
+        defaultValue:false
+    },
     PasswordHash:
     {
         type:DataTypes.STRING,
