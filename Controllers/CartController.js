@@ -5,9 +5,29 @@ export const GetCart = async(req,res,next)=>
 {
     try
     {
-        const userCart = await req.user.getCart({include:'Products'})
+        let userCart = await req.user.getCart({include:'Products'})
         console.log(userCart)
-        return res.status(200).json({statusCode:'200',message:`User:${req.user.Id} cart is fetched successfully`,records:userCart})
+        if(userCart)
+            userCart = {
+            Id:userCart.Id,
+            UserId:userCart.UserId,
+            TotalCost:userCart.TotalCost,
+            CreatedAt:userCart.CreatedAt,
+            UpdatedAt:userCart.UpdatedAt,
+            Products:userCart.Products.map(product=>({
+                Id: product.Id,
+                Name: product.Name,
+                Description: product.Description,
+                Cost: product.Cost,
+                ImageUrl: product.ImageUrl,
+                Category: product.Category,
+                SubCategory: product.SubCategory,
+                ManufacturedOn: product.ManufacturedOn,
+                ManufacturedBy: product.ManufacturedBy,
+                Quantity: product.CartProducts.Quantity,
+            }))
+        }
+        return res.status(200).json({statusCode:'200',message:`User:${req.user.Id} cart is fetched successfully`,records:userCart??{}})
     }
     catch(err)
     {

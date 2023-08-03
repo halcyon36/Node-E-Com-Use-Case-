@@ -24,7 +24,7 @@ const OrderProducts = AzureMySqlSequelize.define('OrderProducts',
     },
     Quantity:
     {
-        type:DataTypes.DOUBLE,
+        type:DataTypes.INTEGER,
         defaultValue:0
     }
 })

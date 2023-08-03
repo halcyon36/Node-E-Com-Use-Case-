@@ -7,8 +7,30 @@ export const GetOrdersById = async(req,res,next)=>
         const {id:orderId} = req.params
         if(!orderId) throw new Error(`invalid request, orderId is missing`)
         if(!req.user.hasOrder(orderId)) throw new Error(`${orderId} doesn't exists`)
-        const order = await req.user.getOrders({where:{Id:orderId},include:'Products'})
-        return res.status(200).json({statusCode:'200',message:`Order: ${orderId} fetched successfully`,records:order}) 
+        let orders = await req.user.getOrders({where:{Id:orderId},include:'Products'})
+        if(orders.length>0)    
+            orders = orders.map(order=>
+            ({
+                OrderId:order.Id,
+                UserId:order.UserId,
+                OrderStatus:order.Status,
+                TotalCost:order.TotalCost,
+                createdAt:order.createdAt,
+                updatedAt:order.updatedAt,
+                Products:order.Products.map(product=>({
+                    Id: product.Id,
+                    Name: product.Name,
+                    Description: product.Description,
+                    Cost: product.Cost,
+                    ImageUrl: product.ImageUrl,
+                    Category: product.Category,
+                    SubCategory: product.SubCategory,
+                    ManufacturedOn: product.ManufacturedOn,
+                    ManufacturedBy: product.ManufacturedBy,
+                    OrderedQuantity: product.OrderProducts.Quantity,
+                }))
+            }))
+        return res.status(200).json({statusCode:'200',message:`Order: ${orderId} fetched successfully`,records:orders}) 
     }
     catch(err)
     {
@@ -30,6 +52,28 @@ export const GetOrdersByStatus = async(req,res,next)=>
             orders = await user.getOrders({where:{status:orderStatus},include:'Products'})
         else 
             orders = await user.getOrders({include:'Products'})
+        if(orders.length>0)
+            orders = orders.map(order=>
+            ({
+                OrderId:order.Id,
+                UserId:order.UserId,
+                OrderStatus:order.Status,
+                TotalCost:order.TotalCost,
+                createdAt:order.createdAt,
+                updatedAt:order.updatedAt,
+                Products:order.Products.map(product=>({
+                    Id: product.Id,
+                    Name: product.Name,
+                    Description: product.Description,
+                    Cost: product.Cost,
+                    ImageUrl: product.ImageUrl,
+                    Category: product.Category,
+                    SubCategory: product.SubCategory,
+                    ManufacturedOn: product.ManufacturedOn,
+                    ManufacturedBy: product.ManufacturedBy,
+                    OrderedQuantity: product.OrderProducts.Quantity,
+                }))
+            }))
         return res.status(200).json({statusCode:'200',message:`${orders.length} ${(orderStatus==='pending'||orderStatus==='placed'||orderStatus==='cancelled')?orderStatus+' ':''}orders found`,records:orders}) 
     }
     catch(err)
@@ -80,18 +124,10 @@ export const PlaceOrder = async(req,res,next)=>
         const {id:orderId} = req.params
         if(!orderId) new Error('Invalid request, OrderId is missing')
         let fetchedOrder = (await req.user.getOrders({where:{Id:orderId}}))[0]
-        //check availability
-        // let productsAvailable = true
-        // orderedProducts = await fetchedOrder.getProducts()
-        // orderedProducts.forEach(async(product)=>
-        // {
-        //     const productExists = await Product.findOne({where:{Id:product.Id,Quantity:product.OrderProducts.Quantity}})
-        //      if(!productExists) productsAvailable = false
-        // })
-        // if(!productsAvailable)
-        //     return res.status(200).json({statusCode:'400',message:`Order:${orderId} placing failed due to products unavailabililty`})
         if(!fetchedOrder) throw new Error(`Order:${orderId} is invalid or does not exists`)
         fetchedOrder.Status = 'placed'
+        //send an event to hub stating order placed with orderId
+        
         await fetchedOrder.save()
         return res.status(200).json({statusCode:'200',message:`Order:${orderId} Placed successfully`})
     }

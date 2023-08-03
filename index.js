@@ -21,6 +21,11 @@ import swaggerUi from 'swagger-ui-express'
 import UserAddress from "./Models/UserAddress.js";
 import WarehouseProducts from "./Models/WarehouseProducts.js";
 import Shipment from "./Models/Shipment.js";
+import Seller from "./Models/Seller.js";
+import SellerProducts from "./Models/SellerProducts.js";
+import WarehouseSellers from "./Models/WarehouseSellers.js";
+import UserVerification from "./Models/UserVerification.js";
+import { publishEventtoServiceBus } from "./Utils/publishEventtoServiceBus.js";
 const app = Express();
 const swaggerOptions = 
 {
@@ -59,17 +64,37 @@ app.use('/orders',OrderRoutes)
 app.use('/userAddress',UserAddressRoutes)
 app.use('/warehouse',WarehouseRoutes)
 app.use('/shipment',ShipmentRoutes)
-//user cart
+app.use('/test',async(req,res,next)=>
+{
+    await publishEventtoServiceBus("userqueue","test",{message:'this is atest message'})
+})
+//user cart (one to one)
 User.hasOne(Cart)
 Cart.belongsTo(User)
 
-//user address
+//user address (one to many)
 User.hasMany(UserAddress)
 UserAddress.belongsTo(User)
 
-//user shipping
+//user shipping (one to many)
 User.hasMany(Shipment)
 Shipment.belongsTo(User)
+
+//user seller (one to one)
+User.hasOne(Seller)
+Seller.belongsTo(User)
+
+//user email verification table
+User.hasOne(UserVerification)
+UserVerification.belongsTo(User)
+
+//seller products
+Seller.belongsToMany(Product,{through:SellerProducts})
+Product.belongsToMany(Seller,{through:SellerProducts})
+
+//seller warehouses
+Seller.belongsToMany(Warehouse,{through:WarehouseSellers})
+Warehouse.belongsToMany(Seller,{through:WarehouseSellers})
 
 //Cart product
 Cart.belongsToMany(Product,{through:CartProducts})
@@ -90,7 +115,6 @@ Product.belongsToMany(Warehouse,{through:WarehouseProducts})
 //orders shipment
 Order.hasOne(Shipment)
 Shipment.belongsTo(Order)
-
 // await user.createCart()
 // console.log(await user.getCart())
 // const userCart = await user.getCart()
@@ -102,6 +126,6 @@ Shipment.belongsTo(Order)
 // console.log(userOrders)
 app.listen(process.env.PORT||PORT, () => console.log("running!!!"))
 // AzureMySqlSequelize
-//   .sync({force:true})
+//   .sync({alter:true})
 //   .then((_) => app.listen(PORT, () => console.log("running!!!")))
 //   .catch((err) => console.log(err));

@@ -13,7 +13,7 @@ const Order = AzureMySqlSequelize.define('Order',
     Status:
     {
         type:DataTypes.STRING,
-        values:["pending","cancelled","placed"],
+        values:["pending","cancelled","placed","successful"],
         defaultValue:"pending",
         allowNull:false
     },

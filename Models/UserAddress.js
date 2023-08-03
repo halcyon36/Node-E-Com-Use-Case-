@@ -12,7 +12,7 @@ const UserAddress = AzureMySqlSequelize.define('UserAddress',
       AddressType:
       {
         type: DataTypes.STRING,
-        values:["permanent","default","shipping","others"],
+        values:["permanent","default","shipping","seller","others"],
         allowNull:true
       },
       AddressLine1: {

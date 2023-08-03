@@ -1,4 +1,7 @@
 import User from "../Models/User.js";
+import { Op } from "sequelize";
+import generateVerificationCode from "../Utils/generateVerificationCode.js";
+import UserVerification from "../Models/UserVerification.js";
 export const GetAllUsers = async (req,res,next)=>
 {
     try
@@ -31,9 +34,18 @@ export const CreateUser = async(req,res,next)=>
     try
     {
         const userDetails = {...req.body}
-        console.log(userDetails)
         const newUser = await User.create(userDetails) 
-        return res.status(200).json({statusCode:200,message:newUser})
+        if(newUser.IsSeller)
+        {
+            const seller = await newUser.createSeller({})
+            console.log(`User:${newUser.Id} is registered as Seller:${seller.Id}`)
+            return res.status(200).json({statusCode:200,message:`user:${newUser.Id} is created as seller successfully`,result:{
+                User:newUser
+            }})
+        }
+        return res.status(200).json({statusCode:200,message:`user:${newUser.Id} creation successful`,result:{
+            User:newUser
+        }})
     }
     catch(err)
     {
@@ -132,5 +144,53 @@ export const setDefaultAddress = async(req,res,next)=>
     catch(err)
     {
         return res.status(400).json({statusCode:400,message:err.message})       
+    }
+}
+export const getVerificationCode = async(req,res,next)=>
+{
+    try
+    {
+        let {length} = req.query
+        const {id:userId} = req.params
+        if(!userId) throw {statusCode:400,message:'Invalid request, userId is missing'}
+        length = (length && length>12)?length:22
+        if(!length) length=22
+        const code = generateVerificationCode(length)
+        const user = await User.findOne({where:{Id:userId}})
+        if(!user) throw {statusCode:400,message:'Invalid request, user does not exists'}
+        await UserVerification.destroy({where:{UserId:userId}})
+        const details = {VerificationCode:code,ExpiresOn:new Date(Date.now()+3600 * 1000)}
+        await user.createUserVerification(details)
+        return res.status(200).json({statusCode:200,message:`verification code generated successfully for user:${userId}`,result:details})
+    }
+    catch(err)
+    {
+        return res.status(err.statusCode??400).json({statusCode:err.statusCode??'400',operation:'getVerificationCode',message:err.message,capturedDateTime:new Date(Date.now())})        
+    }
+}
+export const verifyUserEmailPost = async(req,res,next)=>
+{
+    try
+    {
+        const {code:verificationCode} = req.params
+        const {Email, Password} = req.body
+        if(!verificationCode || !Email || !Password) throw {statusCode:422,message:`Invalid request, details are missing`}
+        const foundUser = await User.findOne({where:{Email:Email}})
+        if(!foundUser) throw {statusCode:404,message:`User:${Email} does not exists`}
+        //password verification
+        const UserVerificationCode = await foundUser.getUserVerification({where:{VerificationCode:verificationCode,ExpiresOn:{[Op.gte]:new Date(Date.now())}}})
+        if(!UserVerificationCode) 
+        {
+            await UserVerification.destroy({where:{UserId:foundUser.Id}})
+            throw {statusCode:422,message:`Verification code got expired`}
+        }
+        foundUser.IsActive = true
+        await foundUser.save()
+        await UserVerification.destroy({where:{UserId:foundUser.Id}})
+        return res.status(200).json({statusCode:200,message:`User:${Email} verification successful`})
+    }
+    catch(err)
+    {
+        return res.status(err.statusCode??'400').json({statusCode:err.statusCode??'400',operation:'verifyUserEmail',message:err.message,capturedDateTime:new Date(Date.now())})        
     }
 }

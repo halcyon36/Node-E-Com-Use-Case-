@@ -27,10 +27,6 @@ const Product = AzureMySqlSequelize.define('Product',
     {
         type:DataTypes.STRING
     },
-    Seller:
-    {
-        type:DataTypes.STRING
-    },
     Category:
     {
         type:DataTypes.STRING
@@ -46,26 +42,6 @@ const Product = AzureMySqlSequelize.define('Product',
     ManufacturedBy:
     {
         type:DataTypes.STRING
-    },
-    Location:
-    {
-        type:DataTypes.STRING
-    },
-    Zipcode:
-    {
-        type:DataTypes.STRING
-    },
-    City:
-    {
-        type:DataTypes.STRING
-    },
-    State:
-    {
-        type:DataTypes.STRING
-    },
-    Country:
-    {
-        type:DataTypes.STRING
-    }
+    }    
 })
 export default  Product

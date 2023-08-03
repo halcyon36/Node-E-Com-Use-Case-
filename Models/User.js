@@ -57,6 +57,11 @@ const User = AzureMySqlSequelize.define(
     {
         type:DataTypes.STRING,
         allowNull:false,
+    },
+    IsSeller:
+    {
+      type:DataTypes.BOOLEAN,
+      defaultValue:false      
     }
   },
   { timestamps: true }

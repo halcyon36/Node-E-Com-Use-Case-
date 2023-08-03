@@ -25,7 +25,7 @@ const CartProducts = AzureMySqlSequelize.define('CartProducts',
     },
     Quantity:
     {
-        type:DataTypes.DOUBLE,
+        type:DataTypes.INTEGER,
         defaultValue:0
     }
 })

@@ -26,6 +26,24 @@ export const GetWarehousesById = async(req, res, next)=>
         return res.status(400).json({statusCode:'400',operation:'GetWarehousesById',message:err.message,capturedDateTime:Date.now()})
     }
 }
+export const GetAllWarehouseSellers = async(req, res, next)=>
+{
+    try
+    {
+        const {id:warehouseId} = req.params
+        if(!warehouseId) throw new Error('Invalid request, WarehouseId is missing')
+        const warehousesSellerList = await Warehouse.findOne({where:{Id:warehouseId},include:[
+            "Sellers",
+            "Products"
+        ]})
+        return res.status(200).json({statusCode:200, message:`${warehousesSellerList.length} Warehouses Sellers fetched`,result:warehousesSellerList})
+    }
+    catch(err)
+    {
+        return res.status(400).json({statusCode:'400',operation:'GetAllWarehouses',message:err.message,error:err,capturedDateTime:Date.now()})
+    }
+}
+
 export const CreateWarehouse = async(req, res, next)=>
 {
     try

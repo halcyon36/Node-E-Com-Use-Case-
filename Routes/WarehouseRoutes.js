@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { GetAllWarehouses,GetWarehousesById,CreateWarehouse,UpdateWarehouse,DeleteWarehouse,CreateWarehouseInbulk } from "../Controllers/WarehouseController.js";
+import { GetAllWarehouses,GetWarehousesById,CreateWarehouse,UpdateWarehouse,DeleteWarehouse,CreateWarehouseInbulk, GetAllWarehouseSellers } from "../Controllers/WarehouseController.js";
 const WarehouseRoutes = Router()
 WarehouseRoutes.get('/',GetAllWarehouses)
 WarehouseRoutes.get('/:id',GetWarehousesById)
+WarehouseRoutes.get('/sellers/:id',GetAllWarehouseSellers)
 WarehouseRoutes.post('/bulk',CreateWarehouseInbulk)
 WarehouseRoutes.post('/',CreateWarehouse)
 WarehouseRoutes.patch('/:id',UpdateWarehouse)
