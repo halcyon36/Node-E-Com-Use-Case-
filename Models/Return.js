@@ -16,7 +16,7 @@ const Return = AzureMySqlSequelize.define('Return',
         allowNull:false,
         references:
         {
-            model:'Product',
+            model:'Products',
             key:'Id'
         }
     },

@@ -27,6 +27,7 @@ import SellerProducts from "./Models/SellerProducts.js";
 import WarehouseSellers from "./Models/WarehouseSellers.js";
 import UserVerification from "./Models/UserVerification.js";
 import { publishEventtoServiceBus } from "./Utils/publishEventtoServiceBus.js";
+import Return from "./Models/Return.js";
 const app = Express();
 const swaggerOptions = 
 {
@@ -53,8 +54,8 @@ app.use(Express.urlencoded({extended:true}))
 app.use(Express.json({extended:true}))
 app.use(async(req,res,next)=>
 {
-    // const user = await User.findByPk('d703bf2a-36f1-4145-9eb4-2c82f0368435');
-    // req.user = user
+    const user = await User.findByPk('ba0dff65-151a-4c6a-8cd1-854af085760f');
+    req.user = user
     next();
 })
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
@@ -117,6 +118,11 @@ Product.belongsToMany(Warehouse,{through:WarehouseProducts})
 //orders shipment
 Order.hasOne(Shipment)
 Shipment.belongsTo(Order)
+
+//orders return
+Return.hasMany(Order)
+Order.belongsTo(Return)
+
 // await user.createCart()
 // console.log(await user.getCart())
 // const userCart = await user.getCart()
@@ -126,8 +132,8 @@ Shipment.belongsTo(Order)
 // const userOrders = await order.addProducts(await userCart.getProducts())
 //await userCart.removeProduct('5bb9c8c7-7c42-4c59-a336-30977948fb59')
 // console.log(userOrders)
-//app.listen(process.env.PORT||PORT, () => console.log("running!!!"))
-AzureMySqlSequelize
-  .sync({alter:true})
-  .then((_) => app.listen(PORT, () => console.log("running!!!")))
-  .catch((err) => console.log(err));
+app.listen(process.env.PORT||PORT, () => console.log("running!!!"))
+/*  AzureMySqlSequelize
+   .sync({alter:true})
+   .then((_) => app.listen(PORT, () => console.log("running!!!")))
+   .catch((err) => console.log(err)); */

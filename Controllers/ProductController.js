@@ -29,7 +29,7 @@ export const GetAllProducts = async(req,res,next)=>
         [
             {
                 model:UserAddress,
-                where:{...addressfilter,AddressType:'seller'},
+                where:{...addressfilter},
             },
             {
                 model:Seller,
@@ -38,9 +38,9 @@ export const GetAllProducts = async(req,res,next)=>
                 [
                     {
                         model:Product,
-                        where:productFilters
-                        // attributes: ['Id', 'Name', 'Description', 'Cost', 'ImageUrl', 'Category', 'SubCategory', 'ManufacturedOn', 'ManufacturedBy'],
-                        // through:{attributes:["Quantity"]}
+                        where:productFilters,
+                        attributes: ['Id', 'Name', 'Description', 'Cost', 'ImageUrl', 'Category', 'SubCategory', 'ManufacturedOn', 'ManufacturedBy'],
+                        through:{attributes:["Quantity"]}
                     }
                 ]
             }

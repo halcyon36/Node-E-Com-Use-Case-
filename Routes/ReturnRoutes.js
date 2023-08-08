@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { GetReturn,ClearReturn,AddReturn,CancelReturn } from "../Controllers/ReturnController.js";
+import { GetReturn,GetReturnById,AddReturn,CancelReturn } from "../Controllers/ReturnController.js";
 const ReturnRoutes = Router()
 ReturnRoutes.get('/',GetReturn)
-ReturnRoutes.delete('/',ClearReturn)
-ReturnRoutes.post('/:pid&:oid&:reason',AddReturn)
-ReturnRoutes.delete('/:id',CancelReturn)
+ReturnRoutes.get('/:id',GetReturnById)
+ReturnRoutes.post('/',AddReturn)
+ReturnRoutes.put('/cancel/:id',CancelReturn)
 export default ReturnRoutes

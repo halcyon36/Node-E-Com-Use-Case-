@@ -1,43 +1,52 @@
 
 import { Op } from "sequelize";
+import Return from "../Models/Return.js";
+
 export const GetReturn = async(req,res,next)=>
 {
     try
     {
-        const userReturn = await req.user.getReturn()
-        if(userReturn)
-        return res.status(200).json({statusCode:'200',message:`User:${req.user.Id} has been initiated for return`,data:userReturn})
+        const ReturnData = await Return.findAll()
+        if(ReturnData)
+        return res.status(200).json({statusCode:'200',message:`all return data`,data:ReturnData})
         else
-        return res.status(200).json({statusCode:'200',message:`User:${req.user.Id} has no return request`})
+        return res.status(200).json({statusCode:'200',message:`no return request`})
     }
-    catch(err)
+    catch(err)  
     {
         return res.status(400).json({statusCode:'400',message:err.message})
     }
 
 }
 
-export const ClearReturn = async(req,res,next)=>
+
+export const GetReturnById = async(req,res,next)=>
 {
     try
     {
-        const userReturn = await req.user.getReturn()
-        if(userReturn)
-            await userReturn.destroy()
-        return res.status(200).json({statusCode:'200',message:`User:${req.user.Id} return has been cleared successfully`})
+        const {id:returnId} = req.params
+        console.log({id:returnId});
+        const ReturnData = await Return.findOne({ where: {id:returnId} })
+        if(ReturnData)
+        return res.status(200).json({statusCode:'200',message:`all return data`,data:ReturnData})
+        else
+        return res.status(200).json({statusCode:'200',message:`no return request`})
     }
-    catch(err)
+    catch(err)  
     {
-        return res.status(400).json({statusCode:'400',operation:'userReturn',message:err.message,capturedDateTime:Date.now()})
+        return res.status(400).json({statusCode:'400',message:err.message})
     }
+
 }
 
 export const AddReturn = async(req,res,next)=>
 {
+    const returnDetails = {...req.body}
+    console.log(returnDetails);
     try
     {
-        const userReturn = await req.user.createReturn({productId:req.params.pid,OrderId:req.params.oid,Reason:req.params.reason})
-        return res.status(200).json({statusCode:'200',message:`Return: ${userReturn.Id} placed`})     
+        const createdReturn = await Return.create(returnDetails)
+        return res.status(200).json({statusCode:'200',message:`Return: ${createdReturn.Id} placed`})     
     }
     catch(err)
     {
@@ -50,16 +59,16 @@ export const CancelReturn = async(req,res,next)=>
     try
     {
         const {id:returnId} = req.params
+        //console.log({id:returnId});
         if(!returnId) throw new Error(`Invalid request, returnId is missing`)
-        const userReturn = await req.user.getReturn({where:{Id:returnId}})
-        if(userReturn)
-        {
-            userReturn[0].Status = 'cancelled'
-            await userReturn[0].save()
-            return res.status(200).json({statusCode:'200',message:`Return: ${returnId} cancel successful`,result:{returnId:userReturn[0].Id}})         
-        }
-        else 
-            return res.status(400).json({statusCode:'200',message:`Return: ${returnId} does not exists`})     
+        const ReturnData = await Return.findOne({where:{Id:returnId}})
+        //console.log(ReturnData);
+        if(!ReturnData) throw new Error(`No return found with id `+returnId)
+        const UpdateSuccess = await ReturnData.update({Status:"cancelled"})
+        console.log(UpdateSuccess);
+        if(!UpdateSuccess) throw new Error(`Internal Error `+UpdateSuccess)
+        ReturnData.save()
+        return res.status(200).json({statusCode:'200',message:`cancel successful`,result:{returnId}})           
     }   
     catch(err)
     {
