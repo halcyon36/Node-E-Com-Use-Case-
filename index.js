@@ -1,4 +1,4 @@
-const PORT = 8003;
+const PORT = 8008;
 import Express from "express";
 import UserRoutes from "./Routes/UserRoutes.js";
 import ProductRoutes from "./Routes/ProductRoutes.js";
@@ -7,6 +7,7 @@ import OrderRoutes from "./Routes/OrderRoutes.js";
 import UserAddressRoutes from "./Routes/UserAddressRoutes.js";
 import WarehouseRoutes from "./Routes/WarehouseRoutes.js";
 import ShipmentRoutes from "./Routes/ShipmentRoutes.js";
+import ReturnRoutes from "./Routes/ReturnRoutes.js";
 import UsersList from './TestFiles/UsersList.js'
 import AzureMySqlSequelize from "./Utils/AzureMySqlSequelize.js";
 import User from "./Models/User.js";
@@ -45,15 +46,15 @@ const swaggerOptions =
             }
         ]
     },
-    apis:['./routes/*.js']
+    apis:['./Routes/*.js']
 }
 const swaggerSpec = swaggerJSDoc(swaggerOptions)
 app.use(Express.urlencoded({extended:true}))
 app.use(Express.json({extended:true}))
 app.use(async(req,res,next)=>
 {
-    const user = await User.findByPk('d703bf2a-36f1-4145-9eb4-2c82f0368435');
-    req.user = user
+    // const user = await User.findByPk('d703bf2a-36f1-4145-9eb4-2c82f0368435');
+    // req.user = user
     next();
 })
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerSpec))
@@ -64,9 +65,10 @@ app.use('/orders',OrderRoutes)
 app.use('/userAddress',UserAddressRoutes)
 app.use('/warehouse',WarehouseRoutes)
 app.use('/shipment',ShipmentRoutes)
+app.use('/return',ReturnRoutes)
 app.use('/test',async(req,res,next)=>
 {
-    await publishEventtoServiceBus("userqueue","test",{message:'this is atest message'})
+    return res.status(200).json({status:'working'})
 })
 //user cart (one to one)
 User.hasOne(Cart)
@@ -124,8 +126,8 @@ Shipment.belongsTo(Order)
 // const userOrders = await order.addProducts(await userCart.getProducts())
 //await userCart.removeProduct('5bb9c8c7-7c42-4c59-a336-30977948fb59')
 // console.log(userOrders)
-app.listen(process.env.PORT||PORT, () => console.log("running!!!"))
-// AzureMySqlSequelize
-//   .sync({alter:true})
-//   .then((_) => app.listen(PORT, () => console.log("running!!!")))
-//   .catch((err) => console.log(err));
+//app.listen(process.env.PORT||PORT, () => console.log("running!!!"))
+AzureMySqlSequelize
+  .sync({alter:true})
+  .then((_) => app.listen(PORT, () => console.log("running!!!")))
+  .catch((err) => console.log(err));

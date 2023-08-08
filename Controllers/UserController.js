@@ -4,6 +4,8 @@ import generateVerificationCode from "../Utils/generateVerificationCode.js";
 import UserVerification from "../Models/UserVerification.js";
 export const GetAllUsers = async (req,res,next)=>
 {
+console.log("getuser Called");
+
     try
     {
         const users = await User.findAll();
